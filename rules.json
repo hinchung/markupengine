@@ -22,8 +22,18 @@
         },
         {
           "ruleTypeKey": "cabinclassname",
-          "cabinclassKey": "economy",
+          "cabinclassNameKey": "economy",
           "operatorKey": "equalto"
+        },
+        {
+          "ruleTypeKey": "cabinclasscode",
+          "cabinclassCodeKey": "Y,N,P,C,Q",
+          "operatorKey": "isin"
+        },
+        {
+          "ruleTypeKey": "triptype",
+          "triptypeKey": "roundtrip",
+          "operatorKey": "notequalto"
         }
       ],
       "point": 40,
@@ -45,8 +55,14 @@
         },
         {
           "ruleTypeKey": "cabinclassname",
-          "cabinclassKey": "economy",
+          "cabinclassNameKey": "economy",
           "operatorKey": "equalto"
+        },
+        {
+          "ruleTypeKey": "travelperiod",
+          "travelperiodFromKey": "2025-01-13",
+          "travelperiodToKey": "2025-06-30",
+          "operatorKey": "between"
         }
       ],
       "point": 30,
@@ -74,12 +90,36 @@
         },
         {
           "ruleTypeKey": "cabinclassname",
-          "cabinclassKey": "economy",
+          "cabinclassNameKey": "economy",
           "operatorKey": "equalto"
-        } 
+        },
+        {
+          "ruleTypeKey": "flightnumber",
+          "flightNumberKey": "123,456",
+          "operatorKey": "isin"
+        },
+        {
+          "ruleTypeKey": "travelperiod",
+          "travelperiodFromKey": "2025-01-13",
+          "travelperiodToKey": "2025-06-30",
+          "operatorKey": "between"
+        }
+
       ],
       "point": 30,
       "markupValue":10
+    },
+    {
+      "ruleId": 4,
+      "conditions": [
+        {
+          "ruleTypeKey": "airline",
+          "airlineKey": "All",
+          "operatorKey": "equalto"
+        }
+      ],
+      "point": 10,
+      "markupValue":50
     }
   ]
 }

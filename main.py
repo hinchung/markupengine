@@ -1,6 +1,7 @@
 import json
 from typing import List, Dict
 from enum import Enum
+from datetime import datetime
 
 
 class MatchType(Enum):
@@ -8,6 +9,8 @@ class MatchType(Enum):
     NOT_EQUAL = 'notequalto'
     IS_IN = 'isin'
     IS_NOT_IN = 'isnotin'
+    BETWEEN = 'between'
+
 
 # Mapping dictionaries
 AIRPORT_TO_COUNTRY = {
@@ -123,12 +126,12 @@ def match_origin(pnr_value: str, condition: Dict) -> bool:
     
     return False
 
-def match_cabinclass(pnr_value: str, condition: Dict) -> bool:
+def match_cabinclassname(pnr_value: str, condition: Dict) -> bool:
     """
     Match cabin class specific rules
     """
-    pnr_cabin = pnr_value.lower()
-    rule_value = condition['cabinclassKey'].lower()
+    pnr_cabinname = pnr_value.lower()
+    rule_value = condition['cabinclassNameKey'].lower()
     operator = MatchType(condition['operatorKey'])
     
     # Handle comma-separated values
@@ -140,14 +143,142 @@ def match_cabinclass(pnr_value: str, condition: Dict) -> bool:
         
     match operator:
         case MatchType.EQUAL:
-            return pnr_cabin in rule_values
+            return pnr_cabinname in rule_values
         case MatchType.NOT_EQUAL:
-            return pnr_cabin not in rule_values
+            return pnr_cabinname not in rule_values
         case MatchType.IS_IN:
-            return pnr_cabin in rule_values
+            return pnr_cabinname in rule_values
         case MatchType.IS_NOT_IN:
-            return pnr_cabin not in rule_values
+            return pnr_cabinname not in rule_values
     
+    return False
+
+def match_cabinclasscode(pnr_value: str, condition: Dict) -> bool:
+    """
+    Match cabin class code specific rules
+    """
+    pnr_cabincode = pnr_value.lower()
+    rule_value = condition['cabinclassCodeKey'].lower()
+    operator = MatchType(condition['operatorKey'])
+    
+    # Handle comma-separated values
+    rule_values = set(rule_value.split(',')) if ',' in rule_value else {rule_value}
+    
+    # Special case for 'all'
+    if rule_value == 'all':
+        return True if operator == MatchType.EQUAL else False
+        
+    match operator:
+        case MatchType.EQUAL:
+            return pnr_cabincode in rule_values
+        case MatchType.NOT_EQUAL:
+            return pnr_cabincode not in rule_values
+        case MatchType.IS_IN:
+            return pnr_cabincode in rule_values
+        case MatchType.IS_NOT_IN:
+            return pnr_cabincode not in rule_values
+    
+    return False
+
+def match_triptype(pnr_value: str, condition: Dict) -> bool:
+    """
+    Match trip type specific rules
+    """
+    pnr_triptype = pnr_value.lower()
+    rule_value = condition['triptypeKey'].lower()
+    operator = MatchType(condition['operatorKey'])
+    
+    # Handle comma-separated values
+    rule_values = set(rule_value.split(',')) if ',' in rule_value else {rule_value}
+    
+    # # Special case for 'all'
+    # if rule_value == 'all':
+    #     return True if operator == MatchType.EQUAL else False
+        
+    match operator:
+        case MatchType.EQUAL:
+            return pnr_triptype in rule_values
+        case MatchType.NOT_EQUAL:
+            return pnr_triptype not in rule_values
+        case MatchType.IS_IN:
+            return pnr_triptype in rule_values
+        case MatchType.IS_NOT_IN:
+            return pnr_triptype not in rule_values
+    
+    return False
+
+def match_flightnumber(pnr_value: str, condition: Dict) -> bool:
+    """
+    Match trip type specific rules
+    """
+    pnr_flightnumber = pnr_value.lower()
+    rule_value = condition['flightNumberKey'].lower()
+    operator = MatchType(condition['operatorKey'])
+    
+    # Handle comma-separated values
+    rule_values = set(rule_value.split(',')) if ',' in rule_value else {rule_value}
+    
+    # # Special case for 'all'
+    # if rule_value == 'all':
+    #     return True if operator == MatchType.EQUAL else False
+        
+    match operator:
+        case MatchType.EQUAL:
+            return pnr_flightnumber in rule_values
+        case MatchType.NOT_EQUAL:
+            return pnr_flightnumber not in rule_values
+        case MatchType.IS_IN:
+            return pnr_flightnumber in rule_values
+        case MatchType.IS_NOT_IN:
+            return pnr_flightnumber not in rule_values
+    
+    return False    
+
+def match_travelperiod(pnr_data: Dict, condition: Dict) -> bool:
+    """
+    Match travel period specific rules
+    Args:
+        pnr_data: Dictionary containing travel period from and to dates
+        condition: Dictionary containing rule conditions
+    Returns:
+        bool: True if the date range matches the condition, False otherwise
+    """
+    try:
+        # Convert string dates to datetime objects
+        pnr_from = datetime.strptime(pnr_data['travelperiodfrom'], '%Y-%m-%d')
+        pnr_to = datetime.strptime(pnr_data['travelperiodto'], '%Y-%m-%d')
+        
+        operator = MatchType(condition['operatorKey'])
+        
+        match operator:
+            case MatchType.BETWEEN:
+                rule_from = datetime.strptime(condition['travelperiodFromKey'], '%Y-%m-%d')
+                rule_to = datetime.strptime(condition['travelperiodToKey'], '%Y-%m-%d')
+                # Check if any part of the PNR travel period overlaps with the rule period
+                return not (pnr_to < rule_from or pnr_from > rule_to)
+                
+            # case MatchType.EQUAL:
+            #     rule_date = datetime.strptime(condition['travelperiodFromKey'], '%Y-%m-%d')
+            #     return pnr_from == rule_date
+                
+            # case MatchType.NOT_EQUAL:
+            #     rule_date = datetime.strptime(condition['travelperiodFromKey'], '%Y-%m-%d')
+            #     return pnr_from != rule_date
+                
+            # case MatchType.IS_IN:
+            #     rule_dates = [datetime.strptime(d.strip(), '%Y-%m-%d') 
+            #                 for d in condition['travelperiodFromKey'].split(',')]
+            #     return pnr_from in rule_dates
+                
+            # case MatchType.IS_NOT_IN:
+            #     rule_dates = [datetime.strptime(d.strip(), '%Y-%m-%d') 
+            #                 for d in condition['travelperiodFromKey'].split(',')]
+            #     return pnr_from not in rule_dates
+                
+    except (ValueError, KeyError) as e:
+        print(f"Error processing travel period: {e}")
+        return False
+        
     return False
 
 def match_condition(pnr_data: Dict, condition: Dict) -> bool:
@@ -162,7 +293,15 @@ def match_condition(pnr_data: Dict, condition: Dict) -> bool:
         case 'destination':
             return match_destination(pnr_data.get('destination', ''), condition)
         case 'cabinclassname':
-            return match_cabinclass(pnr_data.get('cabinclass', ''), condition)
+            return match_cabinclassname(pnr_data.get('cabinclassname', ''), condition)
+        case 'cabinclasscode':
+            return match_cabinclasscode(pnr_data.get('cabinclasscode', ''), condition)
+        case 'triptype':
+            return match_triptype(pnr_data.get('triptype', ''), condition)
+        case 'flightnumber':
+            return match_flightnumber(pnr_data.get('flightnumber', ''), condition)
+        case 'travelperiod':
+            return match_travelperiod(pnr_data, condition) 
     
     return False
 
@@ -223,10 +362,15 @@ def find_matching_rules(pnr_data: Dict, rules_file: str = 'rules.json') -> List[
 if __name__ == '__main__':
     # Example usage
     pnr_data = {
-        "airline": "AC",
-        "origin": "SHA",
+        "airline": "CX",
+        "origin": "LGW",
         "destination": "PEK",
-        "cabinclass": "economy"
+        "cabinclassname": "economy",
+        "cabinclasscode": "Y",
+        "triptype": "roundtrip",
+        "flightnumber": "456",
+        "travelperiodfrom": "2025-01-20",
+        "travelperiodto": "2025-02-07"
     }
 
     matching_rules = find_matching_rules(pnr_data)
