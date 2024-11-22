@@ -1,0 +1,85 @@
+{
+  "rules": [
+    {
+      "ruleId": 1,
+      "conditions": [
+        {
+          "ruleTypeKey": "airline",
+          "airlineKey": "CX,AA,AC",
+          "operatorKey": "isin"
+        },
+        {
+          "ruleTypeKey": "origin",
+          "originKey": "CN",
+          "operatorKey": "equalto",
+          "secondLayer": "country"
+        },
+        {
+          "ruleTypeKey": "destination",
+          "destinationKey": "CN",
+          "operatorKey": "equalto",
+          "secondLayer": "country"
+        },
+        {
+          "ruleTypeKey": "cabinclassname",
+          "cabinclassKey": "economy",
+          "operatorKey": "equalto"
+        }
+      ],
+      "point": 40,
+      "markupValue":100
+    },
+    {
+      "ruleId": 2,
+      "conditions": [
+        {
+          "ruleTypeKey": "airline",
+          "airlineKey": "CX",
+          "operatorKey": "equalto"
+        },
+        {
+          "ruleTypeKey": "origin",
+          "originKey": "SHA,HKG,KIX,LHR",
+          "operatorKey": "isin",
+          "secondLayer": "airport"
+        },
+        {
+          "ruleTypeKey": "cabinclassname",
+          "cabinclassKey": "economy",
+          "operatorKey": "equalto"
+        }
+      ],
+      "point": 30,
+      "markupValue":10
+    },
+    {
+      "ruleId": 3,
+      "conditions": [
+        {
+          "ruleTypeKey": "airline",
+          "airlineKey": "All",
+          "operatorKey": "equalto"
+        },
+        {
+          "ruleTypeKey": "origin",
+          "originKey": "UK",
+          "operatorKey": "equalto",
+          "secondLayer": "country"
+        },
+        {
+          "ruleTypeKey": "origin",
+          "originKey": "LHR",
+          "operatorKey": "notequalto",
+          "secondLayer": "airport"
+        },
+        {
+          "ruleTypeKey": "cabinclassname",
+          "cabinclassKey": "economy",
+          "operatorKey": "equalto"
+        } 
+      ],
+      "point": 30,
+      "markupValue":10
+    }
+  ]
+}
